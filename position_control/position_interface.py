@@ -42,11 +42,11 @@ class Position:
         self.PosStopF = math.pow(10, 9)
         self.VelStopF = 16000.0
 
-        self.sin_mid_q = [0.0, 1.2, -2.0]
+        self.sin_mid_q = [0.0, 1.2, -2.0, 0.0, 1.2, -2.0, 0.0, 1.2, -2.0, 0.0, 1.2, -2.0]
 
         self.dt = 0.002
         self.qInit = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        self.qDes = [0, 0, 0]
+        self.qDes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.sin_count = 0
         self.rate_count = 0
         self.Kp = [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
@@ -67,101 +67,36 @@ class Position:
         self.udp.GetRecv(self.state)
 
     def pos_init(self):
-        self.qInit[0] = self.state.motorState[self.d['FR_0']].q
-        self.qInit[1] = self.state.motorState[self.d['FR_1']].q
-        self.qInit[2] = self.state.motorState[self.d['FR_2']].q
-        self.qInit[3] = self.state.motorState[self.d['FR_3']].q
-        self.qInit[4] = self.state.motorState[self.d['FR_4']].q
-        self.qInit[5] = self.state.motorState[self.d['FR_5']].q
-        self.qInit[6] = self.state.motorState[self.d['FR_6']].q
-        self.qInit[7] = self.state.motorState[self.d['FR_7']].q
-        self.qInit[8] = self.state.motorState[self.d['FR_8']].q
-        self.qInit[9] = self.state.motorState[self.d['FR_9']].q
-        self.qInit[10] = self.state.motorState[self.d['FR_10']].q
-        self.qInit[11] = self.state.motorState[self.d['FR_11']].q
+        self.time_counter()
+        self.receive_state()
+
+        j=0
+        for i in self.d:
+            self.qInit[j] = self.state.motorState[self.d[i]].q
+            j+=1
 
         #self.Kp = [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
         #self.Kd = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        self.send_pos(self.qInit)
 
     def time_counter(self):
         time.sleep(self.dt)
         self.motiontime += 1
 
     def send_pos(self, qDes):
-        self.udp.Recv()
-        self.udp.GetRecv(self.state)
-
-        self.cmd.motorCmd[self.d['FR_0']].q = qDes[0]
-        self.cmd.motorCmd[self.d['FR_0']].dq = 0
-        self.cmd.motorCmd[self.d['FR_0']].Kp = self.Kp[0]
-        self.cmd.motorCmd[self.d['FR_0']].Kd = self.Kd[0]
-        self.cmd.motorCmd[self.d['FR_0']].tau = -1.6
-
-        self.cmd.motorCmd[self.d['FR_1']].q = qDes[1]
-        self.cmd.motorCmd[self.d['FR_1']].dq = 0
-        self.cmd.motorCmd[self.d['FR_1']].Kp = self.Kp[1]
-        self.cmd.motorCmd[self.d['FR_1']].Kd = self.Kd[1]
-        self.cmd.motorCmd[self.d['FR_1']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_2']].q = qDes[2]
-        self.cmd.motorCmd[self.d['FR_2']].dq = 0
-        self.cmd.motorCmd[self.d['FR_2']].Kp = self.Kp[2]
-        self.cmd.motorCmd[self.d['FR_2']].Kd = self.Kd[2]
-        self.cmd.motorCmd[self.d['FR_2']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_3']].q = qDes[3]
-        self.cmd.motorCmd[self.d['FR_3']].dq = 0
-        self.cmd.motorCmd[self.d['FR_3']].Kp = self.Kp[3]
-        self.cmd.motorCmd[self.d['FR_3']].Kd = self.Kd[3]
-        self.cmd.motorCmd[self.d['FR_3']].tau = -1.6
-
-        self.cmd.motorCmd[self.d['FR_4']].q = qDes[4]
-        self.cmd.motorCmd[self.d['FR_4']].dq = 0
-        self.cmd.motorCmd[self.d['FR_4']].Kp = self.Kp[4]
-        self.cmd.motorCmd[self.d['FR_4']].Kd = self.Kd[4]
-        self.cmd.motorCmd[self.d['FR_4']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_5']].q = qDes[5]
-        self.cmd.motorCmd[self.d['FR_5']].dq = 0
-        self.cmd.motorCmd[self.d['FR_5']].Kp = self.Kp[5]
-        self.cmd.motorCmd[self.d['FR_5']].Kd = self.Kd[5]
-        self.cmd.motorCmd[self.d['FR_5']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_6']].q = qDes[6]
-        self.cmd.motorCmd[self.d['FR_6']].dq = 0
-        self.cmd.motorCmd[self.d['FR_6']].Kp = self.Kp[6]
-        self.cmd.motorCmd[self.d['FR_6']].Kd = self.Kd[6]
-        self.cmd.motorCmd[self.d['FR_6']].tau = -1.6
-
-        self.cmd.motorCmd[self.d['FR_7']].q = qDes[7]
-        self.cmd.motorCmd[self.d['FR_7']].dq = 0
-        self.cmd.motorCmd[self.d['FR_7']].Kp = self.Kp[7]
-        self.cmd.motorCmd[self.d['FR_7']].Kd = self.Kd[7]
-        self.cmd.motorCmd[self.d['FR_7']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_8']].q = qDes[8]
-        self.cmd.motorCmd[self.d['FR_8']].dq = 0
-        self.cmd.motorCmd[self.d['FR_8']].Kp = self.Kp[8]
-        self.cmd.motorCmd[self.d['FR_8']].Kd = self.Kd[8]
-        self.cmd.motorCmd[self.d['FR_8']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_9']].q = qDes[9]
-        self.cmd.motorCmd[self.d['FR_9']].dq = 0
-        self.cmd.motorCmd[self.d['FR_9']].Kp = self.Kp[9]
-        self.cmd.motorCmd[self.d['FR_9']].Kd = self.Kd[9]
-        self.cmd.motorCmd[self.d['FR_9']].tau = -1.6
-
-        self.cmd.motorCmd[self.d['FR_10']].q = qDes[10]
-        self.cmd.motorCmd[self.d['FR_10']].dq = 0
-        self.cmd.motorCmd[self.d['FR_10']].Kp = self.Kp[10]
-        self.cmd.motorCmd[self.d['FR_10']].Kd = self.Kd[10]
-        self.cmd.motorCmd[self.d['FR_10']].tau = 0
-
-        self.cmd.motorCmd[self.d['FR_11']].q = qDes[11]
-        self.cmd.motorCmd[self.d['FR_11']].dq = 0
-        self.cmd.motorCmd[self.d['FR_11']].Kp = self.Kp[11]
-        self.cmd.motorCmd[self.d['FR_11']].Kd = self.Kd[11]
-        self.cmd.motorCmd[self.d['FR_11']].tau = 0
+        #self.udp.Recv()
+        #self.udp.GetRecv(self.state)
+        j=0
+        for i in self.d:
+            self.cmd.motorCmd[self.d[i]].q = qDes[j]
+            self.cmd.motorCmd[self.d[i]].dq = 0
+            self.cmd.motorCmd[self.d[i]].Kp = self.Kp[j]
+            self.cmd.motorCmd[self.d[i]].Kd = self.Kd[j]
+            if (j % 3 == 0):
+                self.cmd.motorCmd[self.d[i]].tau = -1.6
+            else:
+                self.cmd.motorCmd[self.d[i]].tau = 0
+            j+=1
 
         self.udp.SetSend(self.cmd)
         self.udp.Send()
@@ -170,6 +105,26 @@ class Position:
         self.time_counter()
         self.receive_state()
 
-        if (self.motiontime >= 10 and self.motiontime < 400):
+        if (self.motiontime >= 50 and self.motiontime < 400):
             self.rate_count += 1
             rate = self.rate_count / 200.0
+            for i in range(12):
+                self.qDes[i] = jointLinearInterpolation(self.qInit[i], self.sin_mid_q[i], rate)
+        freq_Hz = 1
+        freq_rad = freq_Hz * 2 * math.pi
+        t = self.dt * self.sin_count
+        if (self.motiontime >= 400):
+            self.sin_count += 1
+            sin_joint = [0, 0.6 * math.sin(t * freq_rad), -0.9 * math.sin(t * freq_rad)]
+            for i in range(12):
+                self.qDes[i] = self.sin_mid_q[i] + sin_joint[i % 3]
+
+        self.send_pos(self.qDes)
+
+
+if __name__ == '__main__':
+    position = Position()
+    for i in range(50):
+        position.pos_init()
+    while True:
+        position.test()
