@@ -68,7 +68,9 @@ class Custom():
         self.udp.GetRecv(self.state)
 
         # print(motiontime, state.motorState[0].q, state.motorState[1].q, state.motorState[2].q)
-        print(self.state.imu.rpy[2])
+        print('footForce', self.state.footForce)
+        #print('footForceEst', self.state.footForceEst)
+        #print()
 
         self.cmd.mode = 0  # 0:idle, default stand      1:forced stand     2:walk continuously
         self.cmd.gaitType = 0
@@ -163,7 +165,7 @@ if __name__ == '__main__':
     print("Press Enter to continue...")
     input()
 
-    for i in range(60):
+    for i in range(50):
         custom.ChangeLevel()
         custom.UDPSend()
         custom.UDPRecv()
