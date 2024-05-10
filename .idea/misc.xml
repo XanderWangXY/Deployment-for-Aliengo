@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="aliengo" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="aliengo" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="deployment-for-aliengo" project-jdk-type="Python SDK" />
 </project>
