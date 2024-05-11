@@ -107,6 +107,7 @@ if __name__ == '__main__':
     proprioception = torch.ones(1, 53)
     test_depth=depth_rec(image, proprioception)
 
+############
     device = torch.device('cpu')
     n_priv_explicit = 3 + 3 + 3  # self.base_lin_vel * self.obs_scales.lin_vel+0 * self.base_lin_vel+0 * self.base_lin_vel
     n_priv_latent = 4 + 1 + 12 + 12  # priv_latent=mass_params+friction_coeffs+motor_strength[0] - 1+motor_strength[1] - 1
