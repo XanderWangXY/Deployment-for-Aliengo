@@ -91,42 +91,39 @@ class DepthImage(nn.Module):
         )
 
 
+depth_conv = DepthOnlyFCBackbone58x87()
+depth_rec = RecurrentDepthBackbone(depth_conv)
 
-if __name__ == '__main__':
-    depth_conv = DepthOnlyFCBackbone58x87()
-    depth_rec = RecurrentDepthBackbone(depth_conv)
-
-    dirs = glob.glob(f"../policy/*")
-    logdir = sorted(dirs)
-    print(logdir)
-    policy = torch.jit.load(logdir[0])
-    vision_weight = torch.load(logdir[1])
-    vision_weight = vision_weight['depth_encoder_state_dict']
-    depth_rec.load_state_dict(vision_weight)
-    image = torch.ones(1, 58, 87)
-    proprioception = torch.ones(1, 53)
-    test_depth=depth_rec(image, proprioception)
+dirs = glob.glob(f"../policy/*")
+logdir = sorted(dirs)
+print(logdir)
+policy = torch.jit.load(logdir[0])
+vision_weight = torch.load(logdir[1])
+vision_weight = vision_weight['depth_encoder_state_dict']
+depth_rec.load_state_dict(vision_weight)
+image = torch.ones(1, 58, 87)
+proprioception = torch.ones(1, 53)
+test_depth=depth_rec(image, proprioception)
 
 ############
-    device = torch.device('cpu')
-    n_priv_explicit = 3 + 3 + 3  # self.base_lin_vel * self.obs_scales.lin_vel+0 * self.base_lin_vel+0 * self.base_lin_vel
-    n_priv_latent = 4 + 1 + 12 + 12  # priv_latent=mass_params+friction_coeffs+motor_strength[0] - 1+motor_strength[1] - 1
-    num_scan = 132  # height
-    num_actions = 12  # motor position
+device = torch.device('cpu')
+n_priv_explicit = 3 + 3 + 3  # self.base_lin_vel * self.obs_scales.lin_vel+0 * self.base_lin_vel+0 * self.base_lin_vel
+n_priv_latent = 4 + 1 + 12 + 12  # priv_latent=mass_params+friction_coeffs+motor_strength[0] - 1+motor_strength[1] - 1
+num_scan = 132  # height
+num_actions = 12  # motor position
 
-    # depth_buffer_len = 2
-    depth_resized = (87, 58)
-    n_proprio = 3 + 2 + 3 + 4 + 36 + 4 + 1  # history buf
-    history_len = 10
-    num_envs = 1
+# depth_buffer_len = 2
+depth_resized = (87, 58)
+n_proprio = 3 + 2 + 3 + 4 + 36 + 4 + 1  # history buf
+history_len = 10
+num_envs = 1
 
 
-    obs_input = torch.ones(num_envs, n_proprio + num_scan + n_priv_explicit + n_priv_latent + history_len * n_proprio,
+obs_input = torch.ones(num_envs, n_proprio + num_scan + n_priv_explicit + n_priv_latent + history_len * n_proprio,
                            device=device)
-    depth_latent = torch.ones(1, 32, device=device)
+depth_latent = torch.ones(1, 32, device=device)
 
-    test_policy = policy(obs_input, depth_latent)
+test_policy = policy(obs_input, depth_latent)
 
-    print(test_depth)
-    print(test_policy)
-
+    #print(test_depth)
+#print(test_policy)

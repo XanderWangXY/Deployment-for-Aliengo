@@ -104,8 +104,8 @@ class Position:
     def test(self):
         self.time_counter()
         self.receive_state()
-        print('footForce', self.state.footForce)
-        print('footForceEst', self.state.footForceEst)
+        #print('footForce', self.state.footForce)
+        #print('footForceEst', self.state.footForceEst)
 
         if (self.motiontime >= 50 and self.motiontime < 400):
             self.rate_count += 1
@@ -122,6 +122,8 @@ class Position:
                 self.qDes[i] = self.sin_mid_q[i] + sin_joint[i % 3]
 
         self.send_pos(self.qDes)
+        print(self.qDes)
+        print()
 
 
 if __name__ == '__main__':
@@ -132,3 +134,4 @@ if __name__ == '__main__':
         position.pos_init()
     while True:
         position.test()
+        #print(position.state.imu.quaternion)

@@ -1,6 +1,11 @@
 import time
 import torch
-from position_control import Position
+import sys, os
+
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BASE)
+from position_control.position_control import Position
+#from position_control import Position
 
 class InitPos:
     def __init__(self, a_x, a_y, a_z, m_x, m_y, m_z):
@@ -195,8 +200,18 @@ class KF:
         self.x = x_est + K @ (self.y - self.C @ x_est)
         self.P = (torch.eye((K @ self.C).shape[0]) - K @ self.C) @ P_est
 
-    def run_KF(self):
-        pass
+    def run_KF(self,imu_acc,imu_gyo,imu_rpy):
+        initpos = InitPos(imu_acc[0], imu_acc[1], imu_acc[2], imu_gyo[0], imu_gyo[1], imu_gyo[2])
+
+        initpos.get_Euler()
+        initpos.euler_to_rot()
+        initpos.get_a_world()
+
+        imu_rpy = torch.Tensor(imu_rpy)
+        imu_rpy = imu_rpy.reshape(3, 1)
+        #print(imu_rpy)
+        # imu_rpy=torch.Tensor([position.state.imu.rpy[0]],[position.state.imu.rpy[1]],[position.state.imu.rpy[2]])
+        self.kalman_filter(imu_rpy)
 
 if __name__ == '__main__':
     position=Position()
@@ -207,17 +222,7 @@ if __name__ == '__main__':
         imu_rpy=[position.state.imu.rpy[0],position.state.imu.rpy[1],position.state.imu.rpy[2]]
         imu_acc=[position.state.imu.accelerometer[0],position.state.imu.accelerometer[1],position.state.imu.accelerometer[2]]
         imu_gyo=[position.state.imu.gyroscope[0],position.state.imu.gyroscope[1],position.state.imu.gyroscope[2]]
-        initpos=InitPos(imu_acc[0],imu_acc[1],imu_acc[2],imu_gyo[0],imu_gyo[1],imu_gyo[2])
 
-        initpos.get_Euler()
-        initpos.euler_to_rot()
-        initpos.get_a_world()
+        print(kf.x[:3],type(kf.x[:3]))
 
-        print(initpos.a_world)
-
-        imu_rpy=torch.Tensor(imu_rpy)
-        imu_rpy=imu_rpy.reshape(3,1)
-        print(imu_rpy)
-        #imu_rpy=torch.Tensor([position.state.imu.rpy[0]],[position.state.imu.rpy[1]],[position.state.imu.rpy[2]])
-        kf.kalman_filter(imu_rpy)
-        print(kf.x)
+        kf.run_KF(imu_acc,imu_gyo,imu_rpy)
